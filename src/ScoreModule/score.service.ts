@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserScore, UserScoreSchema } from './schemas/userScore.schema';
+import { UserScoreDto } from './dtos/userScore.dto';
 
 @Injectable()
 export class ScoreService {
@@ -10,5 +11,68 @@ export class ScoreService {
   ) {}
   async countAll(): Promise<number> {
     return await this.userScoreModel.countDocuments();
+  }
+  async getScoreBySbd(sbd: string): Promise<UserScoreDto | null> {
+    const data = await this.userScoreModel.findOne({ sbd });
+    if (!data) {
+      return null;
+    }
+    return data as UserScoreDto;
+  }
+
+  async getTop10GroupA() {
+    const data = await this.userScoreModel.aggregate([
+      {
+        $addFields: {
+          avgA00: {
+            $add: ['$toan', '$vat_li', '$hoa_hoc'],
+          },
+        },
+      },
+      { $sort: { avgA00: -1 } },
+      { $limit: 10 },
+    ]);
+    if (!data) {
+      return null;
+    }
+    return data as UserScoreDto[];
+  }
+
+  async analyzeScores(subject: keyof UserScoreDto) {
+    if (subject === 'sbd' || subject === 'ma_ngoai_ngu') {
+      throw new Error('Invalid subject for analysis');
+    }
+    try {
+      const data = await this.userScoreModel.aggregate([
+        {
+          $project: {
+            point: `$${subject}`,
+            level: {
+              $switch: {
+                branches: [
+                  { case: { $gte: [`$${subject}`, 8] }, then: '>=8' },
+                  { case: { $gte: [`$${subject}`, 6] }, then: '6-<8' },
+                  { case: { $gte: [`$${subject}`, 4] }, then: '4-<6' },
+                ],
+                default: '<4',
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: '$level',
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+
+      return data.map((item) => ({
+        label: item._id,
+        count: item.count,
+      }));
+    } catch (error) {
+      throw new Error('Aggregation failed');
+    }
   }
 }
