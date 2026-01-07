@@ -5,8 +5,8 @@ import { ScoreService } from './score.service';
 export class ScoreController {
   constructor(private readonly scoreService: ScoreService) {}
 
-  @Get('all')
-  getHello(): string {
-    return this.scoreService.getHello();
+  @Get('count/all')
+  async countAll(): Promise<number> {
+    return await this.scoreService.countAll();
   }
 }
