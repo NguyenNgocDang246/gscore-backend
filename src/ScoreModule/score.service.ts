@@ -17,7 +17,7 @@ export class ScoreService {
     if (!data) {
       return null;
     }
-    return data as UserScoreDto;
+    return UserScoreDto.parse(data);
   }
 
   async getTop10GroupA() {
@@ -29,13 +29,24 @@ export class ScoreService {
           },
         },
       },
+      {
+        $group: {
+          _id: '$sbd',
+          doc: { $first: '$$ROOT' },
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: '$doc',
+        },
+      },
       { $sort: { avgA00: -1 } },
       { $limit: 10 },
     ]);
     if (!data) {
       return null;
     }
-    return data as UserScoreDto[];
+    return data.map(UserScoreDto.parse);
   }
 
   async analyzeScores(subject: keyof UserScoreDto) {

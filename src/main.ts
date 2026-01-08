@@ -4,8 +4,12 @@ import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
   const configService = app.get(ConfigService);
+  app.enableCors({
+    origin: [configService.get<string>('FRONTEND_URL')],
+    credentials: true,
+  });
+  app.setGlobalPrefix('api');
   const port = configService.get<number>('PORT') ?? 3001;
   await app.listen(port);
 }

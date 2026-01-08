@@ -10,4 +10,22 @@ export class UserScoreDto {
   dia_li?: number;
   gdcd?: number;
   ma_ngoai_ngu?: string;
+
+  static parse(data: any): UserScoreDto {
+    const dto = new UserScoreDto();
+
+    dto.sbd = data.sbd;
+    dto.toan = data.toan;
+    dto.ngu_van = data.ngu_van;
+    dto.ngoai_ngu = data.ngoai_ngu;
+    dto.vat_li = data.vat_li;
+    dto.hoa_hoc = data.hoa_hoc;
+    dto.sinh_hoc = data.sinh_hoc;
+    dto.lich_su = data.lich_su;
+    dto.dia_li = data.dia_li;
+    dto.gdcd = data.gdcd;
+    dto.ma_ngoai_ngu = data.ma_ngoai_ngu;
+
+    return dto;
+  }
 }
