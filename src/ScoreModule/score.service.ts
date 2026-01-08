@@ -29,17 +29,6 @@ export class ScoreService {
           },
         },
       },
-      {
-        $group: {
-          _id: '$sbd',
-          doc: { $first: '$$ROOT' },
-        },
-      },
-      {
-        $replaceRoot: {
-          newRoot: '$doc',
-        },
-      },
       { $sort: { avgA00: -1 } },
       { $limit: 10 },
     ]);
@@ -61,11 +50,11 @@ export class ScoreService {
             level: {
               $switch: {
                 branches: [
-                  { case: { $gte: [`$${subject}`, 8] }, then: '>=8' },
-                  { case: { $gte: [`$${subject}`, 6] }, then: '6-<8' },
-                  { case: { $gte: [`$${subject}`, 4] }, then: '4-<6' },
+                  { case: { $gte: [`$${subject}`, 8] }, then: 'lv4' },
+                  { case: { $gte: [`$${subject}`, 6] }, then: 'lv3' },
+                  { case: { $gte: [`$${subject}`, 4] }, then: 'lv2' },
                 ],
-                default: '<4',
+                default: 'lv1',
               },
             },
           },
@@ -77,11 +66,12 @@ export class ScoreService {
           },
         },
       ]);
-
-      return data.map((item) => ({
-        label: item._id,
-        count: item.count,
-      }));
+      return data
+        .sort((a, b) => a._id.localeCompare(b._id))
+        .map((item) => ({
+          label: item._id,
+          count: item.count,
+        }));
     } catch (error) {
       throw new Error('Aggregation failed');
     }
