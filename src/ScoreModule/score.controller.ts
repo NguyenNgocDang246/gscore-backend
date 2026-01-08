@@ -15,7 +15,7 @@ export class ScoreController {
   async getTop10GroupA() {
     const data = await this.scoreService.getTop10GroupA();
     if (!data) {
-      throw new NotFoundException('Khong tim thay du lieu');
+      throw new NotFoundException('Data not found');
     }
     return data;
   }
@@ -35,7 +35,7 @@ export class ScoreController {
         'gdcd',
       ];
       if (!validSubjects.includes(subject as keyof UserScoreDto)) {
-        throw new NotFoundException('Subject khong hop le cho viec phan tich');
+        throw new NotFoundException('Invalid subject for analysis');
       }
 
       const data = await this.scoreService.analyzeScores(
@@ -43,7 +43,7 @@ export class ScoreController {
       );
       return data;
     } catch (error) {
-      throw new NotFoundException('Subject khong hop le cho viec phan tich');
+      throw new NotFoundException('Invalid subject for analysis');
     }
   }
 
@@ -51,7 +51,7 @@ export class ScoreController {
   async getScoreBySbd(@Param('sbd') sbd: string) {
     const data = await this.scoreService.getScoreBySbd(sbd);
     if (!data) {
-      throw new NotFoundException('Khong tim thay so bao danh');
+      throw new NotFoundException('Registration number not found');
     }
     return data;
   }
