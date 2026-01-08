@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserScore, UserScoreSchema } from './schemas/userScore.schema';
-import { UserScoreDto } from './dtos/userScore.dto';
+import { ScoreSubject, UserScoreDto } from './dtos/userScore.dto';
 
 @Injectable()
 export class ScoreService {
@@ -38,8 +38,8 @@ export class ScoreService {
     return data.map(UserScoreDto.parse);
   }
 
-  async analyzeScores(subject: keyof UserScoreDto) {
-    if (subject === 'sbd' || subject === 'ma_ngoai_ngu') {
+  async analyzeScores(subject: string) {
+    if (!ScoreSubject.isValid(subject)) {
       throw new Error('Invalid subject for analysis');
     }
     try {

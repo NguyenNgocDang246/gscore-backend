@@ -29,3 +29,21 @@ export class UserScoreDto {
     return dto;
   }
 }
+
+export class ScoreSubject {
+  static readonly validSubjects: (keyof UserScoreDto)[] = [
+    'toan',
+    'ngu_van',
+    'ngoai_ngu',
+    'vat_li',
+    'hoa_hoc',
+    'sinh_hoc',
+    'lich_su',
+    'dia_li',
+    'gdcd',
+  ];
+
+  static isValid(subject: string): subject is keyof UserScoreDto {
+    return this.validSubjects.includes(subject as keyof UserScoreDto);
+  }
+}

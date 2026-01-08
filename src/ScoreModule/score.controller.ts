@@ -1,6 +1,6 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { ScoreService } from './score.service';
-import { UserScoreDto } from './dtos/userScore.dto';
+import { ScoreSubject, UserScoreDto } from './dtos/userScore.dto';
 
 @Controller('score')
 export class ScoreController {
@@ -23,23 +23,12 @@ export class ScoreController {
   @Get('analyze/:subject')
   async analyzeScores(@Param('subject') subject: string) {
     try {
-      const validSubjects: (keyof UserScoreDto)[] = [
-        'toan',
-        'ngu_van',
-        'ngoai_ngu',
-        'vat_li',
-        'hoa_hoc',
-        'sinh_hoc',
-        'lich_su',
-        'dia_li',
-        'gdcd',
-      ];
-      if (!validSubjects.includes(subject as keyof UserScoreDto)) {
+      if (!ScoreSubject.isValid(subject)) {
         throw new NotFoundException('Invalid subject for analysis');
       }
 
       const data = await this.scoreService.analyzeScores(
-        subject as keyof UserScoreDto,
+        subject,
       );
       return data;
     } catch (error) {
