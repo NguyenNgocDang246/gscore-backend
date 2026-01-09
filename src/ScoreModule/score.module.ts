@@ -3,7 +3,7 @@ import { ScoreController } from './score.controller';
 import { ScoreService } from './score.service';
 import { ScoreSeeder } from './score.seeder';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CacheModule } from 'src/CacheModule/cache.module';
+import { CacheModule } from '../CacheModule/cache.module';
 import { UserScore, UserScoreSchema } from './schemas/userScore.schema';
 
 @Module({
