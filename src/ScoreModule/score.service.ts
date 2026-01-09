@@ -70,16 +70,21 @@ export class ScoreService {
       }
       const data = await this.userScoreModel.aggregate([
         {
+          $match: {
+            [subject]: { $ne: null },
+          },
+        },
+        {
           $project: {
-            point: `$${subject}`,
             level: {
               $switch: {
                 branches: [
                   { case: { $gte: [`$${subject}`, 8] }, then: 'lv4' },
                   { case: { $gte: [`$${subject}`, 6] }, then: 'lv3' },
                   { case: { $gte: [`$${subject}`, 4] }, then: 'lv2' },
+                  { case: { $gte: [`$${subject}`, 0] }, then: 'lv1' },
                 ],
-                default: 'lv1',
+                default: 'lv0',
               },
             },
           },
@@ -92,6 +97,7 @@ export class ScoreService {
         },
       ]);
       const result = data
+        .filter((x) => x._id !== 'lv0')
         .sort((a, b) => a._id.localeCompare(b._id))
         .map((item) => ({
           label: item._id,
